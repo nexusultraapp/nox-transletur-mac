@@ -1,0 +1,46 @@
+cmake_minimum_required(VERSION 3.20)
+project(noxir_chiaki_bridge C)
+
+if(NOT DEFINED CHIAKI_SOURCE_DIR)
+    message(FATAL_ERROR "CHIAKI_SOURCE_DIR must point to the Chiaki-NG source tree")
+endif()
+
+set(CHIAKI_ENABLE_GUI OFF CACHE BOOL "" FORCE)
+set(CHIAKI_ENABLE_CLI OFF CACHE BOOL "" FORCE)
+set(CHIAKI_ENABLE_TESTS OFF CACHE BOOL "" FORCE)
+set(CHIAKI_ENABLE_STEAM_SHORTCUT OFF CACHE BOOL "" FORCE)
+set(CHIAKI_ENABLE_FFMPEG_DECODER OFF CACHE STRING "" FORCE)
+set(CHIAKI_ENABLE_PI_DECODER OFF CACHE STRING "" FORCE)
+set(CHIAKI_ENABLE_SETSU OFF CACHE STRING "" FORCE)
+set(CHIAKI_ENABLE_STEAMDECK_NATIVE OFF CACHE STRING "" FORCE)
+set(CHIAKI_LIB_ENABLE_OPUS OFF CACHE BOOL "" FORCE)
+set(CHIAKI_LIB_ENABLE_MBEDTLS OFF CACHE BOOL "" FORCE)
+set(CHIAKI_USE_SYSTEM_CURL ON CACHE STRING "" FORCE)
+set(CHIAKI_USE_SYSTEM_NANOPB OFF CACHE STRING "" FORCE)
+set(CHIAKI_USE_SYSTEM_JERASURE OFF CACHE STRING "" FORCE)
+set(CHIAKI_LIB_JSONC_EXTERNAL_PROJECT OFF CACHE BOOL "" FORCE)
+set(CHIAKI_LIB_MINIUPNPC_EXTERNAL_PROJECT OFF CACHE BOOL "" FORCE)
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+
+add_subdirectory("${CHIAKI_SOURCE_DIR}" chiaki-ng)
+
+add_library(noxir_chiaki_bridge SHARED noxir_chiaki_bridge.c)
+set_target_properties(noxir_chiaki_bridge PROPERTIES
+    C_STANDARD 11
+    C_STANDARD_REQUIRED ON)
+target_link_libraries(noxir_chiaki_bridge PRIVATE chiaki-lib)
+target_include_directories(noxir_chiaki_bridge PRIVATE "${CHIAKI_SOURCE_DIR}/lib/include")
+set_target_properties(noxir_chiaki_bridge PROPERTIES
+    OUTPUT_NAME "noxir-chiaki-bridge"
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/out"
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/out")
+
+# Windows: libnoxir-chiaki-bridge.dll, macOS: libnoxir-chiaki-bridge.dylib
+set(NOXIR_BRIDGE_FILENAME
+    "${CMAKE_SHARED_LIBRARY_PREFIX}noxir-chiaki-bridge${CMAKE_SHARED_LIBRARY_SUFFIX}")
+
+add_custom_command(TARGET noxir_chiaki_bridge POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "$<TARGET_FILE:noxir_chiaki_bridge>"
+        "${CMAKE_CURRENT_SOURCE_DIR}/../${NOXIR_BRIDGE_FILENAME}"
+    VERBATIM)

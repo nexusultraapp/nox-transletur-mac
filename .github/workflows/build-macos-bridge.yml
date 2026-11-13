@@ -1,0 +1,44 @@
+name: Build macOS Chiaki bridge
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'pc/NoxirPlay.PC/native/chiaki-bridge/**'
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-15
+            arch: arm64
+            native_arch: arm64
+          - os: macos-15-intel
+            arch: x64
+            native_arch: x86_64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Clone chiaki-ng
+        run: git clone --depth 1 https://github.com/streetpea/chiaki-ng.git .tools/chiaki-ng
+
+      - name: Install dependencies
+        run: brew install cmake openssl curl miniupnpc json-c dylibbundler
+
+      - name: Build bridge
+        working-directory: pc/NoxirPlay.PC/native/chiaki-bridge
+        env:
+          CHIAKI_SOURCE_DIR: ${{ github.workspace }}/.tools/chiaki-ng
+          ARCH: ${{ matrix.native_arch }}
+        run: |
+          chmod +x build_macos.sh
+          ./build_macos.sh
+
+      - name: Upload dylib
+        uses: actions/upload-artifact@v4
+        with:
+          name: libnoxir-chiaki-bridge-${{ matrix.arch }}
+          path: pc/NoxirPlay.PC/native/chiaki-bridge/artifacts/${{ matrix.arch }}/*.dylib
