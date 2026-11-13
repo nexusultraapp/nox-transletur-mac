@@ -4,6 +4,7 @@ on:
   workflow_dispatch:
   push:
     paths:
+      - '.github/workflows/build-macos-bridge.yml'
       - 'pc/NoxirPlay.PC/native/chiaki-bridge/**'
 
 jobs:
@@ -27,6 +28,12 @@ jobs:
 
       - name: Install dependencies
         run: brew install cmake openssl curl miniupnpc json-c dylibbundler protobuf libevent
+
+      - name: Install Chiaki Python dependency
+        run: |
+          python3 -m venv .tools/chiaki-venv
+          .tools/chiaki-venv/bin/python -m pip install --disable-pip-version-check protobuf
+          echo "$GITHUB_WORKSPACE/.tools/chiaki-venv/bin" >> "$GITHUB_PATH"
 
       - name: Build bridge
         working-directory: pc/NoxirPlay.PC/native/chiaki-bridge
