@@ -22,7 +22,7 @@ if ! command -v cmake >/dev/null 2>&1; then
   echo "cmake bulunamadi. Kurun: brew install cmake"
   exit 1
 fi
-for pkg in openssl curl miniupnpc json-c dylibbundler; do
+for pkg in openssl curl miniupnpc json-c dylibbundler protobuf; do
   if ! brew --prefix "$pkg" >/dev/null 2>&1; then
     echo "Homebrew paketi eksik: $pkg (brew install $pkg)" >&2
     exit 1
