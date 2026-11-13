@@ -22,7 +22,7 @@ if ! command -v cmake >/dev/null 2>&1; then
   echo "cmake bulunamadi. Kurun: brew install cmake"
   exit 1
 fi
-for pkg in openssl curl miniupnpc json-c dylibbundler protobuf; do
+for pkg in openssl curl miniupnpc json-c dylibbundler protobuf libevent; do
   if ! brew --prefix "$pkg" >/dev/null 2>&1; then
     echo "Homebrew paketi eksik: $pkg (brew install $pkg)" >&2
     exit 1
@@ -34,7 +34,7 @@ cmake -S "$SCRIPT_DIR" -B "$BUILD_DIR" \
   -DCHIAKI_SOURCE_DIR="$CHIAKI_SOURCE_DIR" \
   -DCMAKE_BUILD_TYPE=Release \
   -DCMAKE_OSX_ARCHITECTURES="$ARCH" \
-  -DCMAKE_PREFIX_PATH="$(brew --prefix openssl 2>/dev/null || true);$(brew --prefix curl 2>/dev/null || true);$(brew --prefix miniupnpc 2>/dev/null || true);$(brew --prefix json-c 2>/dev/null || true)"
+  -DCMAKE_PREFIX_PATH="$(brew --prefix openssl 2>/dev/null || true);$(brew --prefix curl 2>/dev/null || true);$(brew --prefix miniupnpc 2>/dev/null || true);$(brew --prefix json-c 2>/dev/null || true);$(brew --prefix libevent 2>/dev/null || true)"
 cmake --build "$BUILD_DIR" --config Release
 
 BRIDGE="$BUILD_DIR/out/libnoxir-chiaki-bridge.dylib"

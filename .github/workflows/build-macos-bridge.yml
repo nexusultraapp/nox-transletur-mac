@@ -26,7 +26,7 @@ jobs:
         run: git clone --depth 1 --recurse-submodules --shallow-submodules https://github.com/streetpea/chiaki-ng.git .tools/chiaki-ng
 
       - name: Install dependencies
-        run: brew install cmake openssl curl miniupnpc json-c dylibbundler protobuf
+        run: brew install cmake openssl curl miniupnpc json-c dylibbundler protobuf libevent
 
       - name: Build bridge
         working-directory: pc/NoxirPlay.PC/native/chiaki-bridge
